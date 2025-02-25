@@ -1,54 +1,68 @@
 // src/services/ScheduleService.ts
-import { database } from '../firebase/firebase';
-import { ref, set, get, onValue, DatabaseReference } from 'firebase/database';
-import { ScheduleData } from '../types/schedule';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
+import { firestore } from '../firebase/firebase'; // Import the pre-initialized firestore
+import { ScheduleData, initializeEmptySchedule } from '../types/schedule';
 
-export class ScheduleService {
-  private getUserScheduleRef(userId: string): DatabaseReference {
-    return ref(database, `schedules/${userId}`);
-  }
-
-  // Save a user's schedule to the database
-  async saveSchedule(userId: string, schedule: ScheduleData): Promise<void> {
+class ScheduleService {
+  /**
+   * Save schedule to Firestore
+   */
+  async saveSchedule(userId: string, scheduleData: ScheduleData): Promise<void> {
     try {
-      const scheduleRef = this.getUserScheduleRef(userId);
-      await set(scheduleRef, schedule);
+      // Save to Firestore using the imported firestore instance
+      const docRef = doc(firestore, 'schedules', userId);
+      await setDoc(docRef, { 
+        data: scheduleData,
+        updatedAt: new Date().toISOString() 
+      });
+      console.log("Schedule successfully saved to Firestore");
+      return Promise.resolve();
     } catch (error) {
-      console.error('Error saving schedule:', error);
-      throw error;
+      console.error("Error saving schedule:", error);
+      return Promise.reject(error);
     }
   }
 
-  // Get a user's schedule once
+  /**
+   * Get schedule from Firestore
+   */
   async getSchedule(userId: string): Promise<ScheduleData | null> {
     try {
-      const scheduleRef = this.getUserScheduleRef(userId);
-      const snapshot = await get(scheduleRef);
+      // Try to get from Firestore using the imported firestore instance
+      const docRef = doc(firestore, 'schedules', userId);
+      const docSnap = await getDoc(docRef);
       
-      if (snapshot.exists()) {
-        return snapshot.val() as ScheduleData;
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return data.data as ScheduleData;
       } else {
-        return null;
+        console.log("No schedule found for user, initializing empty schedule");
+        return initializeEmptySchedule();
       }
     } catch (error) {
-      console.error('Error getting schedule:', error);
-      throw error;
+      console.error("Error getting schedule:", error);
+      return Promise.reject(error);
     }
   }
 
-  // Subscribe to real-time updates to a user's schedule
-  subscribeToSchedule(userId: string, callback: (schedule: ScheduleData | null) => void): () => void {
-    const scheduleRef = this.getUserScheduleRef(userId);
-    
-    const unsubscribe = onValue(scheduleRef, (snapshot) => {
-      if (snapshot.exists()) {
-        callback(snapshot.val() as ScheduleData);
+  /**
+   * Subscribe to schedule updates from Firestore
+   */
+  subscribeToSchedule(userId: string, callback: (data: ScheduleData | null) => void) {
+    // Subscribe to Firestore updates using the imported firestore instance
+    const docRef = doc(firestore, 'schedules', userId);
+    const unsubscribe = onSnapshot(docRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        callback(data.data as ScheduleData);
       } else {
-        callback(null);
+        callback(initializeEmptySchedule());
       }
+    }, (error) => {
+      console.error("Error in schedule subscription:", error);
+      callback(null);
     });
-    
-    // Return the unsubscribe function to be called when no longer needed
+
     return unsubscribe;
   }
 }

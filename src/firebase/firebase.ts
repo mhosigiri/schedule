@@ -1,9 +1,7 @@
-// src/firebase/firebase.ts
+// src/firebase.ts
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { getDatabase } from "firebase/database";
-import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,7 +12,8 @@ const firebaseConfig = {
   messagingSenderId: "403527554588",
   appId: "1:403527554588:web:cb870bc499eb8eb98531d9",
   measurementId: "G-2VLQ0W6Y7L",
-  databaseURL: "https://schedule-kc-default-rtdb.firebaseio.com" // Add this for Realtime Database
+  // Add this if you're using Realtime Database
+  databaseURL: "https://schedule-kc-default-rtdb.firebaseio.com"
 };
 
 // Initialize Firebase
@@ -23,21 +22,6 @@ const app = initializeApp(firebaseConfig);
 // Initialize services
 const firestore = getFirestore(app);
 const auth = getAuth(app);
-const database = getDatabase(app);
-const analytics = getAnalytics(app);
 
-// Create a function to get the current user state
-const getCurrentUser = (): Promise<User | null> => {
-  return new Promise((resolve, reject) => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (user) => {
-        unsubscribe();
-        resolve(user);
-      },
-      reject
-    );
-  });
-};
-
-export { app, firestore, auth, database, analytics, getCurrentUser };
+// Export initialized instances
+export { app, firestore, auth };
