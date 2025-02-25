@@ -1,0 +1,32 @@
+/* App.css */
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+:root {
+  --primary-color: #15151e;
+  --secondary-color: #292933;
+  --accent-color: #6c5ce7;
+  --text-color: #ffffff;
+  --border-color: #444;
+  --grid-bg: #1e1e2a;
+  --cell-bg: #2a2a3a;
+  --cell-hover: #3a3a4a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.App {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
