@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { scheduleService } from "../services/ScheduleService";
-import {
-  ScheduleData,
-  Activity,
-  activityTypes,
-  days,
-  timeSlots,
-} from "../types/schedule";
-import { FiSun, FiMoon, FiCalendar, FiGrid } from "react-icons/fi";
+import { ScheduleData, activityTypes, days } from "../types/schedule";
+import { FiCalendar, FiGrid } from "react-icons/fi";
 import "./ActivityTimeline.css";
 import Header from "./Header";
 
@@ -26,7 +20,6 @@ interface ActivityEvent {
 
 const ActivityTimeline: React.FC = () => {
   const { currentUser } = useAuth();
-  const [schedule, setSchedule] = useState<ScheduleData | null>(null);
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -42,7 +35,6 @@ const ActivityTimeline: React.FC = () => {
     const loadSchedule = async () => {
       try {
         const data = await scheduleService.getSchedule(currentUser.uid);
-        setSchedule(data);
         processActivities(data);
         setIsLoading(false);
       } catch (error) {
@@ -58,7 +50,6 @@ const ActivityTimeline: React.FC = () => {
       currentUser.uid,
       (data) => {
         if (data) {
-          setSchedule(data);
           processActivities(data);
         }
       }
@@ -80,15 +71,6 @@ const ActivityTimeline: React.FC = () => {
   const processActivities = (scheduleData: ScheduleData) => {
     const today = new Date();
     const dayIndex = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
-    const dayMapping: { [key: number]: string } = {
-      0: "Sunday",
-      1: "Monday",
-      2: "Tuesday",
-      3: "Wednesday",
-      4: "Thursday",
-      5: "Friday",
-      6: "Saturday",
-    };
 
     const allActivities: ActivityEvent[] = [];
 
