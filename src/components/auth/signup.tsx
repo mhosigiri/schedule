@@ -79,7 +79,7 @@ const Signup: React.FC = () => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1 className="app-title">Schedule</h1>
+            <h1 className="app-title">YourWeek</h1>
             <h2>Create Account</h2>
             <p>Sign up to start organizing your time</p>
           </div>

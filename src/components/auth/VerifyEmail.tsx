@@ -137,7 +137,7 @@ const VerifyEmail: React.FC = () => {
           </div>
 
           <div className="auth-header">
-            <h1 className="app-title">Schedule</h1>
+            <h1 className="app-title">YourWeek</h1>
             <h2>Verify Your Email</h2>
             <p>We've sent a 6-digit code to {email}</p>
           </div>

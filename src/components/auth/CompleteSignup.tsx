@@ -7,7 +7,11 @@ import "./AuthStyles.css";
 const CompleteSignup: React.FC = () => {
   const [_, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { signup } = useAuth();
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState(
+    "Account Created! Redirecting to dashboard..."
+  );
+  const { signup, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,18 +26,41 @@ const CompleteSignup: React.FC = () => {
     const completeSignup = async () => {
       try {
         await signup(email, password, name);
+        setIsSuccess(true);
         // Wait a moment to show success message
         setTimeout(() => {
           navigate("/");
         }, 2000);
       } catch (error: any) {
-        setError(error.message || "Failed to create account");
-        setLoading(false);
+        // Check if this is an "email-already-in-use" error
+        if (error.code === "auth/email-already-in-use") {
+          // Handle this case by logging in instead
+          try {
+            setRedirectMessage("Account exists! Signing you in...");
+            setIsSuccess(true);
+            await login(email, password);
+            // Wait a moment to show success message
+            setTimeout(() => {
+              navigate("/");
+            }, 2000);
+          } catch (loginError: any) {
+            // If login fails, redirect to login page
+            setRedirectMessage("Account exists! Redirecting to login...");
+            setIsSuccess(true);
+            setTimeout(() => {
+              navigate("/login", { state: { email } });
+            }, 2000);
+          }
+        } else {
+          // Handle other errors
+          setError(error.message || "Failed to create account");
+          setLoading(false);
+        }
       }
     };
 
     completeSignup();
-  }, [email, password, name, verified, signup, navigate]);
+  }, [email, password, name, verified, signup, login, navigate]);
 
   if (error) {
     return (
@@ -41,7 +68,7 @@ const CompleteSignup: React.FC = () => {
         <div className="auth-container">
           <div className="auth-card">
             <div className="auth-header">
-              <h1 className="app-title">Schedule</h1>
+              <h1 className="app-title">YourWeek</h1>
               <h2>Error</h2>
               <p>{error}</p>
             </div>
@@ -59,15 +86,12 @@ const CompleteSignup: React.FC = () => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1 className="app-title">Schedule</h1>
+            <h1 className="app-title">YourWeek</h1>
             <div className="success-icon">
               <FiCheck />
             </div>
-            <h2>Account Created!</h2>
-            <p>
-              Your account has been successfully created. Redirecting to
-              dashboard...
-            </p>
+            <h2>{isSuccess ? "Success!" : "Creating Account..."}</h2>
+            <p>{redirectMessage}</p>
           </div>
         </div>
       </div>

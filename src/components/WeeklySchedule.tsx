@@ -31,6 +31,7 @@ const WeeklySchedule: React.FC = () => {
   );
   const [selectedActivity, setSelectedActivity] = useState<string>("work");
   const [activityDescription, setActivityDescription] = useState<string>("");
+  const [isRecurring, setIsRecurring] = useState<boolean>(true);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
@@ -38,6 +39,8 @@ const WeeklySchedule: React.FC = () => {
   const [selectedCells, setSelectedCells] = useState<
     { day: string; time: string }[]
   >([]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [isMultiDayMode, setIsMultiDayMode] = useState<boolean>(false);
 
   // Load and subscribe to schedule data from Realtime Database
   useEffect(() => {
@@ -74,6 +77,15 @@ const WeeklySchedule: React.FC = () => {
 
     return () => unsubscribe();
   }, [currentUser]);
+
+  useEffect(() => {
+    if (isEditing && selectedCells.length > 0) {
+      setSelectedDays([selectedCells[0].day]);
+    } else {
+      setSelectedDays([]);
+      setIsMultiDayMode(false);
+    }
+  }, [isEditing, selectedCells]);
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -144,6 +156,9 @@ const WeeklySchedule: React.FC = () => {
     console.log("Selected cells:", selectedCells);
     console.log("Selected activity:", selectedActivity);
     console.log("Description:", activityDescription);
+    console.log("Is Recurring:", isRecurring);
+    console.log("Selected days:", selectedDays);
+    console.log("Multi-day mode:", isMultiDayMode);
 
     if (selectedCells.length === 0) {
       console.log("No cells selected");
@@ -151,16 +166,51 @@ const WeeklySchedule: React.FC = () => {
     }
 
     const newSchedule = { ...schedule };
-    const activityId = `${Date.now()}`;
+    // Create a base activity ID that will be used to generate related IDs
+    const baseActivityId = `activity-${Date.now()}`;
 
-    selectedCells.forEach(({ day, time }) => {
-      newSchedule[day][time] = {
-        id: activityId,
-        type: selectedActivity,
-        description: activityDescription,
-        isActive: true,
-      };
-    });
+    if (isMultiDayMode && selectedDays.length > 0) {
+      const timeSlots = selectedCells.map((cell) => cell.time);
+
+      selectedDays.forEach((day) => {
+        timeSlots.forEach((time) => {
+          // Create a unique ID for each day-time combination
+          // Format: baseId-day-time (with special characters removed)
+          const uniqueId = `${baseActivityId}-${day}-${time.replace(
+            /[: ]/g,
+            ""
+          )}`;
+
+          newSchedule[day][time] = {
+            id: uniqueId,
+            type: selectedActivity,
+            description: activityDescription,
+            isActive: true,
+            isRecurring: isRecurring,
+            // Add a groupId to track related activities
+            groupId: baseActivityId,
+          };
+        });
+      });
+    } else {
+      selectedCells.forEach(({ day, time }) => {
+        // For single-day mode, still create unique IDs
+        const uniqueId = `${baseActivityId}-${day}-${time.replace(
+          /[: ]/g,
+          ""
+        )}`;
+
+        newSchedule[day][time] = {
+          id: uniqueId,
+          type: selectedActivity,
+          description: activityDescription,
+          isActive: true,
+          isRecurring: isRecurring,
+          // Add a groupId to track related activities
+          groupId: baseActivityId,
+        };
+      });
+    }
 
     try {
       setIsSaving(true);
@@ -170,6 +220,8 @@ const WeeklySchedule: React.FC = () => {
       setSchedule(newSchedule);
       setIsEditing(false);
       setSelectedCells([]);
+      setSelectedDays([]);
+      setIsMultiDayMode(false);
     } catch (error) {
       console.error("Failed to save activity:", error);
       alert("Failed to save activity. Please try again.");
@@ -215,6 +267,16 @@ const WeeklySchedule: React.FC = () => {
 
   const isCellSelected = (day: string, time: string) => {
     return selectedCells.some((cell) => cell.day === day && cell.time === time);
+  };
+
+  const handleDayToggle = (day: string) => {
+    setSelectedDays((prevDays) => {
+      if (prevDays.includes(day)) {
+        return prevDays.filter((d) => d !== day);
+      } else {
+        return [...prevDays, day];
+      }
+    });
   };
 
   if (isLoading) {
@@ -347,6 +409,46 @@ const WeeklySchedule: React.FC = () => {
                   placeholder="Enter activity description"
                 />
               </div>
+
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={isRecurring}
+                    onChange={(e) => setIsRecurring(e.target.checked)}
+                  />
+                  <span>Recurring weekly (repeats every week)</span>
+                </label>
+              </div>
+
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={isMultiDayMode}
+                    onChange={(e) => setIsMultiDayMode(e.target.checked)}
+                  />
+                  <span>Add to multiple days</span>
+                </label>
+              </div>
+
+              {isMultiDayMode && (
+                <div className="form-group days-selection">
+                  <label>Select days:</label>
+                  <div className="days-checkboxes">
+                    {days.map((day) => (
+                      <label key={day} className="day-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={selectedDays.includes(day)}
+                          onChange={() => handleDayToggle(day)}
+                        />
+                        <span>{day.substring(0, 3)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="form-actions">
                 <button onClick={handleAddActivity} disabled={isSaving}>

@@ -1,12 +1,15 @@
 // src/components/Login.tsx
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { FiSun, FiMoon } from "react-icons/fi";
 import "./AuthStyles.css";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const initialEmail = location.state?.email || "";
+
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,12 +54,17 @@ const Login: React.FC = () => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1 className="app-title">Schedule</h1>
+            <h1 className="app-title">YourWeek</h1>
             <h2>Welcome Back</h2>
             <p>Sign in to continue to your schedule</p>
           </div>
 
           {error && <div className="auth-error">{error}</div>}
+          {location.state?.email && (
+            <div className="auth-message">
+              This email already has an account. Please log in.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">

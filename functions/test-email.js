@@ -31,13 +31,13 @@ transporter.verify(function(error, success) {
     
     // Create test email
     const mailOptions = {
-      from: `"Schedule App Test" <${EMAIL_USER}>`,
+      from: `"YourWeek Test" <${EMAIL_USER}>`,
       to: TEST_RECIPIENT,
-      subject: 'Test Email from Schedule App',
+      subject: 'Test Email from YourWeek',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #ff4d4d; text-align: center;">Test Email</h1>
-          <p>This is a test email from your Schedule App to verify that email sending works correctly.</p>
+          <p>This is a test email from your YourWeek to verify that email sending works correctly.</p>
           <p>If you received this email, your SMTP configuration is working properly!</p>
           <p>Time sent: ${new Date().toLocaleString()}</p>
         </div>

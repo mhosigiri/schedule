@@ -1,6 +1,5 @@
 import React from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { FiSun, FiMoon } from "react-icons/fi";
+import { FiSun, FiMoon, FiLogOut } from "react-icons/fi";
 import "./Header.css";
 
 interface HeaderProps {
@@ -16,29 +15,18 @@ const Header: React.FC<HeaderProps> = ({
   isDarkMode,
   toggleTheme,
 }) => {
-  const { logout } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      if (onLogout) onLogout();
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  };
-
   return (
-    <header className={`header ${isDarkMode ? "dark" : "light"}`}>
+    <header className="header">
       <div className="logo-container">
-        <h1>Schedule</h1>
+        <h1 className="brand-logo">YourWeek</h1>
       </div>
       <div className="user-controls">
         <button className="theme-toggle" onClick={toggleTheme}>
           {isDarkMode ? <FiSun /> : <FiMoon />}
         </button>
-        <div className="user-greeting">Hello, {userName || "User"}</div>
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
+        {userName && <span className="user-name">Hi, {userName}</span>}
+        <button className="logout-button" onClick={onLogout}>
+          <FiLogOut /> Logout
         </button>
       </div>
     </header>

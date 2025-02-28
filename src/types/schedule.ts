@@ -14,6 +14,8 @@ export interface Activity {
   type: string;
   description: string;
   isActive: boolean;
+  isRecurring: boolean;
+  groupId?: string; // Optional property to track related activities
 }
 
 export interface DaySchedule {

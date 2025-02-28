@@ -15,6 +15,34 @@
   --success: #4caf50;
 }
 
+/* Brand logo styling */
+.app-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--accent), #ff8080);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+  line-height: 1;
+  position: relative;
+  display: inline-block;
+}
+
+.app-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: scaleX(0.7);
+  opacity: 0.7;
+}
+
 .auth-page {
   display: flex;
   min-height: 100vh;
@@ -100,16 +128,6 @@
 .auth-header {
   text-align: center;
   margin-bottom: 2rem;
-}
-
-.app-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  background: linear-gradient(45deg, var(--accent), #ff9e9e);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .auth-header h2 {
@@ -250,12 +268,23 @@
 }
 
 .auth-error {
-  background: rgba(255, 77, 77, 0.1);
-  color: var(--error);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  padding: 12px;
+  border-radius: 5px;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  color: #ff3333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.auth-message {
+  padding: 12px;
+  border-radius: 5px;
+  background-color: rgba(0, 102, 255, 0.1);
+  border: 1px solid rgba(0, 102, 255, 0.3);
+  color: #0066ff;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .auth-background {
@@ -301,7 +330,7 @@
   }
   
   .app-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
   
   .auth-header h2 {

@@ -8,7 +8,8 @@
  */
 
 import * as functions from 'firebase-functions';
-import { onValueCreated } from 'firebase-functions/v2/database';
+// Remove import since we're not using the database trigger anymore
+// import { onValueCreated } from 'firebase-functions/v2/database';
 import * as admin from 'firebase-admin';
 import * as nodemailer from 'nodemailer';
 const cors = require('cors')({ origin: true });
@@ -39,14 +40,6 @@ transporter.verify(function(error, success) {
   }
 });
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
-
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
 /**
  * Firebase Cloud Functions for Schedule App
  * 
@@ -73,12 +66,12 @@ export const sendVerificationEmail = functions.https.onCall((data: any, context)
 
       // Create email content
       const mailOptions = {
-        from: `"Schedule App" <${EMAIL_USER}>`,
+        from: `"YourWeek" <${EMAIL_USER}>`,
         to: data.email,
-        subject: 'Verify Your Email for Arnis Schedule App',
+        subject: 'Verify Your Email for Arnis YourWeek',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-            <h1 style="color: #ff4d4d; text-align: center;">Arnis Schedule App</h1>
+            <h1 style="color: #ff4d4d; text-align: center;">Arnis YourWeek</h1>
             <h2 style="text-align: center;">Verify Your Email</h2>
             <p>Thank you for signing up! Please use the verification code below to complete your registration:</p>
             <div style="text-align: center; margin: 30px 0;">
@@ -91,7 +84,7 @@ export const sendVerificationEmail = functions.https.onCall((data: any, context)
             Thanks,<br>
             Arnis KC</p>
             <div style="text-align: center; margin-top: 30px; color: #888; font-size: 12px;">
-              <p>© ${new Date().getFullYear()} Arnis Schedule App. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Arnis YourWeek. All rights reserved.</p>
             </div>
           </div>
         `
@@ -127,12 +120,12 @@ export const sendVerificationEmailHttp = functions.https.onRequest((request, res
 
       // Create email content
       const mailOptions = {
-        from: `"Schedule App" <${EMAIL_USER}>`,
+        from: `"YourWeek" <${EMAIL_USER}>`,
         to: email,
-        subject: 'Verify Your Email for Arnis Schedule App',
+        subject: 'Verify Your Email for Arnis YourWeek',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-            <h1 style="color: #ff4d4d; text-align: center;">Schedule App</h1>
+            <h1 style="color: #ff4d4d; text-align: center;">YourWeek</h1>
             <h2 style="text-align: center;">Verify Your Email</h2>
             <p>Thank you for signing up! Please use the verification code below to complete your registration:</p>
             <div style="text-align: center; margin: 30px 0;">
@@ -143,7 +136,7 @@ export const sendVerificationEmailHttp = functions.https.onRequest((request, res
             <p>This code will expire in 15 minutes.</p>
             <p>If you didn't request this verification, you can safely ignore this email.</p>
             <div style="text-align: center; margin-top: 30px; color: #888; font-size: 12px;">
-              <p>© ${new Date().getFullYear()} Schedule App. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} YourWeek. All rights reserved.</p>
             </div>
           </div>
         `
@@ -159,53 +152,4 @@ export const sendVerificationEmailHttp = functions.https.onRequest((request, res
   });
 });
 
-// Function to listen for new verification records in Realtime Database using v2 syntax
-export const watchVerificationCodes = onValueCreated({
-  ref: '/verifications/{userId}'
-}, (event) => {
-  const snapshot = event.data;
-  if (!snapshot) {
-    console.log('No data associated with the event');
-    return null;
-  }
-  
-  const data = snapshot.val();
-  
-  if (!data?.email || !data?.code) {
-    console.error('Missing email or code in verification data');
-    return null;
-  }
-  
-  // Create email content
-  const mailOptions = {
-    from: `"Schedule App" <${EMAIL_USER}>`,
-    to: data.email,
-    subject: 'Verify Your Email for Arnis Schedule App',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-        <h1 style="color: #ff4d4d; text-align: center;">Schedule App</h1>
-        <h2 style="text-align: center;">Verify Your Email</h2>
-        <p>Thank you for signing up! Please use the verification code below to complete your registration:</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <div style="font-size: 32px; letter-spacing: 5px; font-weight: bold; padding: 15px; background-color: #f5f5f5; border-radius: 5px; display: inline-block;">
-            ${data.code}
-          </div>
-        </div>
-        <p>This code will expire in 15 minutes.</p>
-        <p>If you didn't request this verification, you can safely ignore this email.</p>
-        <div style="text-align: center; margin-top: 30px; color: #888; font-size: 12px;">
-          <p>© ${new Date().getFullYear()} Schedule App. All rights reserved.</p>
-        </div>
-      </div>
-    `
-  };
-
-  // Send the email
-  return transporter.sendMail(mailOptions)
-    .catch(error => {
-      console.error('Error sending email from trigger:', error);
-      if (error.response) {
-        console.error('SMTP response error:', error.response.data);
-      }
-    });
-});
+// Removed the database trigger function to prevent duplicate emails
