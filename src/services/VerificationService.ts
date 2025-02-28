@@ -1,7 +1,6 @@
 import { database } from '../firebase';
 import { ref, set, get, remove } from 'firebase/database';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { connectFunctionsEmulator } from 'firebase/functions';
 
 class VerificationService {
   // Generate a random 6-digit code
@@ -80,9 +79,6 @@ class VerificationService {
       
       // Get Firebase Functions instance with the correct region
       const functions = getFunctions();
-      
-      // Explicitly set the region to us-central1 (Firebase's default region)
-      // connectFunctionsEmulator(functions, "localhost", 5001); // Uncomment for local testing
       
       // Create callable function
       const sendEmail = httpsCallable(functions, 'sendVerificationEmail');

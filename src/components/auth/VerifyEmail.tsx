@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { verificationService } from "../../services/VerificationService";
-import { FiSun, FiMoon, FiMail, FiArrowLeft } from "react-icons/fi";
+import { FiSun, FiMoon, FiArrowLeft } from "react-icons/fi";
 import "./AuthStyles.css";
 
 const VerifyEmail: React.FC = () => {

@@ -5,7 +5,7 @@ import { FiCheck } from "react-icons/fi";
 import "./AuthStyles.css";
 
 const CompleteSignup: React.FC = () => {
-  const [loading, setLoading] = useState(true);
+  const [_, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { signup } = useAuth();
   const navigate = useNavigate();

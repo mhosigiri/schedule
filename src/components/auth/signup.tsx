@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { FiSun, FiMoon, FiUser, FiLock, FiMail } from "react-icons/fi";
+import { FiSun, FiMoon } from "react-icons/fi";
 import "./AuthStyles.css";
 import { verificationService } from "../../services/VerificationService";
 
@@ -14,7 +14,7 @@ const Signup: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const { signup, currentUser } = useAuth();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
