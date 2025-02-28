@@ -13,6 +13,8 @@ import Signup from "./components/auth/signup";
 import ActivityTimeline from "./components/ActivityTimeline";
 import ForgotPassword from "./components/auth/ForgotPassword";
 import NotFound from "./components/auth/NotFound";
+import VerifyEmail from "./components/auth/VerifyEmail";
+import CompleteSignup from "./components/auth/CompleteSignup";
 import "./App.css";
 
 // Private route component
@@ -52,6 +54,8 @@ const App: React.FC = () => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/404" element={<NotFound />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/complete-signup" element={<CompleteSignup />} />
             <Route path="*" element={<Navigate to="/404" />} />
           </Routes>
         </div>

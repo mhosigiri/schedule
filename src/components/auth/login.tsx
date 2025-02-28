@@ -1,66 +1,105 @@
 // src/components/Login.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import "./Auth.css";
+import { FiSun, FiMoon, FiUser, FiLock, FiMail } from "react-icons/fi";
+import "./AuthStyles.css";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { login, currentUser } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/");
+    }
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       setError("");
       setLoading(true);
       await login(email, password);
       navigate("/");
-    } catch (error) {
-      setError("Failed to log in. Please check your credentials.");
-      console.error(error);
+    } catch (error: any) {
+      setError(
+        error.message || "Failed to log in. Please check your credentials."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Login</h2>
-        {error && <div className="error-message">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <div className={`auth-page ${isDarkMode ? "dark" : "light"}`}>
+      <div className="theme-toggle-container">
+        <button className="theme-toggle-button" onClick={toggleTheme}>
+          {isDarkMode ? <FiSun /> : <FiMoon />}
+        </button>
+      </div>
+
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h1 className="app-title">Schedule</h1>
+            <h2>Welcome Back</h2>
+            <p>Sign in to continue to your schedule</p>
           </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <div className="auth-input">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+              />
+            </div>
+
+            <div className="forgot-password">
+              <Link to="/forgot-password">Forgot password?</Link>
+            </div>
+
+            <button type="submit" className="auth-button" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            <p>
+              Don't have an account? <Link to="/signup">Sign Up</Link>
+            </p>
           </div>
-          <button type="submit" disabled={loading} className="auth-button">
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-        <div className="auth-footer">
-          Need an account? <Link to="/signup">Sign Up</Link>
         </div>
+      </div>
+
+      <div className="auth-background">
+        <div className="auth-background-pattern"></div>
       </div>
     </div>
   );
