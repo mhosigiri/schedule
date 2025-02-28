@@ -1,459 +1,368 @@
 /* src/components/WeeklySchedule.css */
+:root {
+  --dark-bg: #121212;
+  --dark-surface: #1e1e1e;
+  --dark-text: #ffffff;
+  --dark-text-secondary: rgba(255, 255, 255, 0.7);
+  --light-bg: #ffffff;
+  --light-surface: #f5f5f5;
+  --light-text: #121212;
+  --light-text-secondary: rgba(0, 0, 0, 0.7);
+  --accent: #ff4d4d;
+  --accent-hover: #ff6666;
+}
+
 .weekly-schedule-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #f5f5f5;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 25px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .logo-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .traffic-light {
-    display: flex;
-    margin-right: 15px;
-  }
-  
-  .light {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 5px;
-  }
-  
-  .red { background-color: #ff5f56; }
-  .yellow { background-color: #ffbd2e; }
-  .green { background-color: #27c93f; }
-  
-  .header h1 {
-    font-size: 1.5rem;
-    color: #333;
-    margin: 0;
-  }
-  
-  .user-controls {
-    display: flex;
-    align-items: center;
-  }
-  
-  .user-greeting {
-    margin-right: 15px;
-    font-weight: 500;
-  }
-  
-  .logout-button {
-    padding: 8px 16px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .logout-button:hover {
-    background-color: #d32f2f;
-  }
-  
-  .schedule-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 25px;
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .save-button {
-    padding: 8px 16px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .save-button:hover {
-    background-color: #388e3c;
-  }
-  
-  .save-button:disabled {
-    background-color: #a5d6a7;
-    cursor: not-allowed;
-  }
-  
-  .schedule-content {
-    display: flex;
-    flex: 1;
-    padding: 20px;
-    overflow: auto;
-  }
-  
-  .graphics-sidebar {
-    width: 180px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-  
-  .car-container {
-    position: relative;
-    height: 100px;
-  }
-  
-  .car {
-    position: relative;
-    width: 80px;
-    height: 40px;
-    margin-top: 30px;
-  }
-  
-  .car-top {
-    width: 50px;
-    height: 20px;
-    background-color: #3f51b5;
-    position: absolute;
-    top: -15px;
-    left: 15px;
-    border-radius: 10px 10px 0 0;
-  }
-  
-  .car-body {
-    width: 80px;
-    height: 25px;
-    background-color: #5c6bc0;
-    border-radius: 10px;
-    position: relative;
-  }
-  
-  .car-wheel {
-    width: 15px;
-    height: 15px;
-    background-color: #212121;
-    border-radius: 50%;
-    position: absolute;
-    bottom: -8px;
-  }
-  
-  .wheel-left {
-    left: 15px;
-  }
-  
-  .wheel-right {
-    right: 15px;
-  }
-  
-  .road {
-    height: 5px;
-    background-color: #424242;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-  
-  .books-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .book {
-    width: 100px;
-    height: 20px;
-    border-radius: 3px;
-  }
-  
-  .book1 { background-color: #f44336; }
-  .book2 { background-color: #2196f3; }
-  .book3 { background-color: #4caf50; }
-  
-  .clock {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    border: 3px solid #795548;
-    position: relative;
-    margin: 0 auto;
-  }
-  
-  .clock-face {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-  
-  .clock-hour, .clock-minute {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform-origin: left center;
-  }
-  
-  .clock-hour {
-    width: 25px;
-    height: 4px;
-    background-color: #212121;
-    transform: translateY(-50%) rotate(45deg);
-  }
-  
-  .clock-minute {
-    width: 30px;
-    height: 2px;
-    background-color: #616161;
-    transform: translateY(-50%) rotate(240deg);
-  }
-  
-  .clock-center {
-    width: 8px;
-    height: 8px;
-    background-color: #212121;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  .schedule-grid-container {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 80px repeat(7, 1fr);
-    gap: 1px;
-    background-color: #e0e0e0;
-    border: 1px solid #e0e0e0;
-    overflow: auto;
-  }
-  
-  .time-header, .day-header {
-    background-color: #f5f5f5;
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .time-slot {
-    background-color: #f5f5f5;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.9rem;
-  }
-  
-  .schedule-cell {
-    background-color: #ffffff;
-    min-height: 60px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .schedule-cell:hover {
-    transform: scale(1.02);
-    z-index: 1;
-  }
-  
-  .active-cell {
-    color: white;
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.7);
-  }
-  
-  .activity-icon {
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-  }
-  
-  .activity-description {
-    font-size: 0.85rem;
-    text-align: center;
-    word-break: break-word;
-  }
-  
-  .activity-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .activity-form {
-    background-color: white;
-    padding: 25px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .activity-form h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .activity-types {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  .activity-type {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .activity-type:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .activity-type.selected {
-    border-color: #2196f3;
-    background-color: #e3f2fd;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
-  .form-actions button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-  }
-  
-  .form-actions button:first-child {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .form-actions button:first-child:hover {
-    background-color: #388e3c;
-  }
-  
-  .remove-btn {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .remove-btn:hover {
-    background-color: #d32f2f;
-  }
-  
-  .cancel-btn {
-    background-color: #e0e0e0;
-    color: #333;
-  }
-  
-  .cancel-btn:hover {
-    background-color: #bdbdbd;
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 900px) {
-    .schedule-content {
-      flex-direction: column;
-    }
-    
-    .graphics-sidebar {
-      width: 100%;
-      flex-direction: row;
-      justify-content: space-around;
-    }
-    
-    .activity-types {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
-  @media (max-width: 600px) {
-    .header {
-      flex-direction: column;
-      padding: 10px;
-    }
-    
-    .logo-container {
-      margin-bottom: 10px;
-    }
-    
-    .schedule-grid-container {
-      font-size: 0.8rem;
-    }
-    
-    .time-header, .day-header, .time-slot {
-      padding: 5px;
-    }
-    
-    .schedule-cell {
-      min-height: 50px;
-      padding: 5px;
-    }
-    
-    .activity-icon {
-      font-size: 1.2rem;
-    }
-    
-    .activity-description {
-      font-size: 0.7rem;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.weekly-schedule-container.dark {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+.weekly-schedule-container.light {
+  background-color: var(--light-bg);
+  color: var(--light-text);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  height: 60px;
+}
+
+.schedule-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 2rem;
+  height: 50px;
+  align-items: center;
+}
+
+.schedule-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 0 1rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.schedule-grid-container {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  gap: 1px;
+  overflow: auto;
+  background: var(--border-color);
+  border-radius: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.activity-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.activity-form {
+  background: var(--bg-color);
+  padding: 2.5rem;
+  border-radius: 8px;
+  width: 95%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.schedule-cell {
+  border: 1px solid transparent;
+  min-height: 40px;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+/* Update active cell styles */
+.active-cell {
+  color: white; /* Make text white for better contrast on colored backgrounds */
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Add shadow for better readability */
+}
+
+.active-cell .activity-icon {
+  color: white;
+  font-size: 1.2rem;
+}
+
+.active-cell .activity-description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+}
+
+/* Theme-specific text colors for empty cells */
+.dark .schedule-cell {
+  color: var(--dark-text);
+}
+
+.light .schedule-cell {
+  color: var(--light-text);
+}
+
+.logo-container h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.user-controls {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.dark .theme-toggle {
+  color: var(--dark-text);
+}
+
+.light .theme-toggle {
+  color: var(--light-text);
+}
+
+.dark .schedule-grid-container {
+  background-color: var(--dark-surface);
+}
+
+.light .schedule-grid-container {
+  background-color: var(--light-surface);
+}
+
+.day-header, .time-header {
+  padding: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.8rem;
+}
+
+.activity-icon {
+  font-size: 1.2rem;
+  color: var(--dark-text);
+}
+
+.activity-description {
+  font-size: 0.85rem;
+  color: var(--dark-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dark .schedule-cell:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.light .schedule-cell:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions button {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--dark-surface);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.form-actions button:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.form-actions .remove-btn {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.form-actions .remove-btn:hover {
+  background: #ff4444;
+  color: white;
+}
+
+.form-actions .cancel-btn {
+  border-color: #666;
+  color: #666;
+}
+
+.form-actions .cancel-btn:hover {
+  background: #666;
+  color: white;
+}
+
+/* Update the existing save button style */
+.save-button {
+  background: var(--dark-surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-button:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.dark .activity-form {
+  background-color: var(--dark-surface);
+}
+
+.light .activity-form {
+  background-color: var(--light-surface);
+}
+
+.activity-types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.activity-type {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--dark-text-secondary);
+  background: var(--dark-surface);
+}
+
+.activity-type:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.activity-type.selected {
+  border-color: var(--accent);
+  background: rgba(255, 77, 77, 0.1);
+}
+
+.activity-type .activity-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.activity-type div:last-child {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.selected-cell {
+  position: relative;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+  color: var(--accent) !important; /* Make selected cell text accent colored */
+}
+
+/* Remove borders between adjacent selected cells in the same column */
+.selected-cell + .selected-cell {
+  border-top: none !important;
+}
+
+/* Add a floating "Edit" button when cells are selected */
+.edit-selection {
+  position: absolute;
+  right: 2rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: none;
+}
+
+.edit-selection.visible {
+  display: block;
+}
+
+/* Add more styles as needed */
+
+.edit-selection-button {
+  background: var(--dark-surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-selection-button:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Update the logout button to match other buttons */
+.logout-button {
+  background: var(--dark-surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background: var(--accent);
+  color: white;
+}

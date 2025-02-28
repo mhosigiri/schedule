@@ -1,0 +1,252 @@
+.activity-timeline-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.activity-timeline-container.dark {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+.activity-timeline-container.light {
+  background-color: var(--light-bg);
+  color: var(--light-text);
+}
+
+.navigation-tabs {
+  display: flex;
+  padding: 0 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  color: var(--dark-text-secondary);
+}
+
+.tab:hover {
+  color: var(--accent);
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.timeline-container {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.timeline-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.timeline-header h2 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.current-time {
+  color: var(--dark-text-secondary);
+  font-size: 1.1rem;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--accent), rgba(255, 77, 77, 0.2));
+  border-radius: 3px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding-left: 2rem;
+  transition: all 0.3s ease;
+}
+
+.timeline-item:hover {
+  transform: translateX(5px);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -0.5rem;
+  top: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 3px solid var(--dark-bg);
+  z-index: 1;
+}
+
+.timeline-content {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 4px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.activity-time {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.activity-day {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.activity-hour {
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.relative-time {
+  color: var(--dark-text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-left: auto;
+}
+
+.activity-details {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.activity-type-icon {
+  font-size: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3rem;
+  height: 3rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.activity-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.activity-info p {
+  font-size: 1rem;
+  color: var(--dark-text-secondary);
+}
+
+.past {
+  opacity: 0.6;
+}
+
+.current {
+  background: rgba(255, 77, 77, 0.1);
+  transform: translateX(5px);
+}
+
+.current .timeline-content {
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+}
+
+.no-activities {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--dark-text-secondary);
+}
+
+.add-activity-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.add-activity-link:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+/* Loading screen */
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: var(--dark-text);
+  background: var(--dark-bg);
+}
+
+.login-prompt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: var(--dark-text);
+  background: var(--dark-bg);
+}
+
+@media (max-width: 768px) {
+  .timeline-container {
+    padding: 1rem;
+  }
+  
+  .timeline-item {
+    padding-left: 1rem;
+  }
+  
+  .timeline-content {
+    padding: 1rem;
+  }
+  
+  .activity-time {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .relative-time {
+    margin-left: 0;
+  }
+} 

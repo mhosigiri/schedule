@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { scheduleService } from "../services/ScheduleService";
 import {
@@ -10,58 +11,52 @@ import {
   initializeEmptySchedule,
 } from "../types/schedule";
 import "./WeeklySchedule.css";
+import { FiCalendar, FiGrid } from "react-icons/fi";
+import Header from "./Header";
 
-interface HeaderProps {
-  onLogout: () => void;
-  userName: string | null;
+interface ThemeContextType {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLogout, userName }) => {
-  return (
-    <header className="header">
-      <div className="logo-container">
-        <div className="traffic-light">
-          <div className="light red"></div>
-          <div className="light yellow"></div>
-          <div className="light green"></div>
-        </div>
-        <h1>Interactive Weekly Schedule</h1>
-      </div>
-      <div className="user-controls">
-        <div className="user-greeting">Hello, {userName || "User"}</div>
-        <button className="logout-button" onClick={onLogout}>
-          Logout
-        </button>
-      </div>
-    </header>
-  );
-};
+const ThemeContext = React.createContext<ThemeContextType>({
+  isDarkMode: true,
+  toggleTheme: () => {},
+});
 
 const WeeklySchedule: React.FC = () => {
   const { currentUser, logout } = useAuth();
   const [schedule, setSchedule] = useState<ScheduleData>(
     initializeEmptySchedule()
   );
-  const [selectedDay, setSelectedDay] = useState<string>(days[0]);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<string>("work");
   const [activityDescription, setActivityDescription] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedCells, setSelectedCells] = useState<
+    { day: string; time: string }[]
+  >([]);
 
   // Load and subscribe to schedule data from Realtime Database
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log("No user found");
+      setIsLoading(false);
+      return;
+    }
 
-    // Initial load
     const loadSchedule = async () => {
+      console.log("Loading schedule for user:", currentUser.uid);
       try {
         const data = await scheduleService.getSchedule(currentUser.uid);
-        if (data) {
-          setSchedule(data);
-        }
+        console.log("Loaded schedule:", data);
+        setSchedule(data);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error loading schedule:", error);
+        console.error("Failed to load schedule:", error);
+        setIsLoading(false);
       }
     };
 
@@ -77,20 +72,38 @@ const WeeklySchedule: React.FC = () => {
       }
     );
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [currentUser]);
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const isConnected = await scheduleService.testConnection();
+        console.log("Database connected:", isConnected);
+      } catch (error) {
+        console.error("Connection test failed:", error);
+      }
+    };
+
+    checkConnection();
+  }, []);
 
   // Save schedule to Realtime Database
   const saveSchedule = async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.error("No user found");
+      return;
+    }
 
     setIsSaving(true);
     try {
+      console.log("Saving schedule...");
+      console.log("Current user:", currentUser.uid);
+      console.log("Schedule data:", schedule);
+
       await scheduleService.saveSchedule(currentUser.uid, schedule);
+      console.log("Schedule saved successfully");
       setIsSaving(false);
-      alert("Schedule saved successfully!");
     } catch (error) {
       console.error("Error saving schedule:", error);
       setIsSaving(false);
@@ -107,46 +120,74 @@ const WeeklySchedule: React.FC = () => {
   };
 
   const handleCellClick = (day: string, time: string) => {
-    setSelectedDay(day);
-    setSelectedTime(time);
+    const cellIndex = selectedCells.findIndex(
+      (cell) => cell.day === day && cell.time === time
+    );
 
-    const currentActivity = schedule[day][time];
-    if (currentActivity) {
-      setSelectedActivity(currentActivity.type);
-      setActivityDescription(currentActivity.description);
+    if (cellIndex >= 0) {
+      // If cell is already selected, unselect it
+      setSelectedCells((cells) => cells.filter((_, i) => i !== cellIndex));
     } else {
-      setSelectedActivity("work");
-      setActivityDescription("");
-    }
+      // Add cell to selection if it's in the same column as other selected cells
+      const canSelect =
+        selectedCells.length === 0 ||
+        selectedCells.every((cell) => cell.day === day);
 
-    setIsEditing(true);
+      if (canSelect) {
+        setSelectedCells((cells) => [...cells, { day, time }]);
+      }
+    }
   };
 
-  const handleAddActivity = () => {
-    if (!selectedDay || !selectedTime) return;
+  const handleAddActivity = async () => {
+    console.log("Adding activity...");
+    console.log("Selected cells:", selectedCells);
+    console.log("Selected activity:", selectedActivity);
+    console.log("Description:", activityDescription);
+
+    if (selectedCells.length === 0) {
+      console.log("No cells selected");
+      return;
+    }
 
     const newSchedule = { ...schedule };
-    const activityId = `${selectedDay}-${selectedTime}-${Date.now()}`;
+    const activityId = `${Date.now()}`;
 
-    newSchedule[selectedDay][selectedTime] = {
-      id: activityId,
-      type: selectedActivity,
-      description: activityDescription,
-      isActive: true,
-    };
+    selectedCells.forEach(({ day, time }) => {
+      newSchedule[day][time] = {
+        id: activityId,
+        type: selectedActivity,
+        description: activityDescription,
+        isActive: true,
+      };
+    });
 
-    setSchedule(newSchedule);
-    setIsEditing(false);
+    try {
+      setIsSaving(true);
+      // First save to database
+      await scheduleService.saveSchedule(currentUser!.uid, newSchedule);
+      // Then update local state
+      setSchedule(newSchedule);
+      setIsEditing(false);
+      setSelectedCells([]);
+    } catch (error) {
+      console.error("Failed to save activity:", error);
+      alert("Failed to save activity. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleRemoveActivity = () => {
-    if (!selectedDay || !selectedTime) return;
-
     const newSchedule = { ...schedule };
-    newSchedule[selectedDay][selectedTime] = null;
+
+    selectedCells.forEach(({ day, time }) => {
+      newSchedule[day][time] = null;
+    });
 
     setSchedule(newSchedule);
     setIsEditing(false);
+    setSelectedCells([]);
   };
 
   const getActivityColor = (activity: Activity | null) => {
@@ -158,151 +199,174 @@ const WeeklySchedule: React.FC = () => {
   };
 
   const getActivityIcon = (activity: Activity | null) => {
-    if (!activity) return "";
+    if (!activity) return null;
     const activityType = activityTypes.find(
       (type) => type.id === activity.type
     );
-    return activityType ? activityType.icon : "";
+    if (!activityType) return null;
+
+    const Icon = activityType.icon;
+    return typeof Icon === "string" ? Icon : <Icon />;
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const isCellSelected = (day: string, time: string) => {
+    return selectedCells.some((cell) => cell.day === day && cell.time === time);
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!currentUser) {
+    return <div>Please log in to view your schedule.</div>;
+  }
+
   return (
-    <div className="weekly-schedule-container">
-      <Header
-        onLogout={handleLogout}
-        userName={currentUser?.displayName || null}
-      />
-      <div className="schedule-actions">
-        <button
-          className="save-button"
-          onClick={saveSchedule}
-          disabled={isSaving}
-        >
-          {isSaving ? "Saving..." : "Save Schedule"}
-        </button>
-      </div>
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      <div
+        className={`weekly-schedule-container ${isDarkMode ? "dark" : "light"}`}
+      >
+        <Header
+          onLogout={handleLogout}
+          userName={currentUser?.displayName || null}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
+        />
 
-      <div className="schedule-content">
-        <div className="graphics-sidebar">
-          <div className="car-container">
-            <div className="car">
-              <div className="car-top"></div>
-              <div className="car-body"></div>
-              <div className="car-wheel wheel-left"></div>
-              <div className="car-wheel wheel-right"></div>
-            </div>
-            <div className="road"></div>
-          </div>
+        <div className="navigation-tabs">
+          <Link to="/" className="tab">
+            <FiCalendar /> Timeline
+          </Link>
+          <Link to="/schedule" className="tab active">
+            <FiGrid /> Schedule
+          </Link>
+        </div>
 
-          <div className="books-stack">
-            <div className="book book1"></div>
-            <div className="book book2"></div>
-            <div className="book book3"></div>
-          </div>
+        <div className="schedule-actions">
+          <button
+            className="save-button"
+            onClick={saveSchedule}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Schedule"}
+          </button>
+          {selectedCells.length > 0 && (
+            <button
+              className="edit-selection-button"
+              onClick={() => setIsEditing(true)}
+            >
+              Add Activity ({selectedCells.length} selected)
+            </button>
+          )}
+        </div>
 
-          <div className="clock">
-            <div className="clock-face">
-              <div className="clock-hour"></div>
-              <div className="clock-minute"></div>
-              <div className="clock-center"></div>
-            </div>
+        <div className="schedule-content">
+          <div className="schedule-grid-container">
+            <div className="time-header">Time</div>
+            {days.map((day) => (
+              <div key={day} className="day-header">
+                {day}
+              </div>
+            ))}
+
+            {timeSlots.map((time) => (
+              <React.Fragment key={time}>
+                <div className="time-slot">{time}</div>
+                {days.map((day) => {
+                  const activity = schedule[day][time];
+                  return (
+                    <div
+                      key={`${day}-${time}`}
+                      className={`schedule-cell ${
+                        activity ? "active-cell" : ""
+                      } ${isCellSelected(day, time) ? "selected-cell" : ""}`}
+                      style={{
+                        backgroundColor: activity
+                          ? getActivityColor(activity)
+                          : "",
+                      }}
+                      onClick={() => handleCellClick(day, time)}
+                    >
+                      {activity && (
+                        <>
+                          <div className="activity-icon">
+                            {getActivityIcon(activity)}
+                          </div>
+                          <div className="activity-description">
+                            {activity.description}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
           </div>
         </div>
 
-        <div className="schedule-grid-container">
-          <div className="time-header">Time</div>
-          {days.map((day) => (
-            <div key={day} className="day-header">
-              {day}
-            </div>
-          ))}
+        {isEditing && (
+          <div className="activity-modal">
+            <div className="activity-form">
+              <h2>
+                {selectedCells.length} time slot
+                {selectedCells.length > 1 ? "s" : ""} selected
+              </h2>
 
-          {timeSlots.map((time) => (
-            <React.Fragment key={time}>
-              <div className="time-slot">{time}</div>
-              {days.map((day) => {
-                const activity = schedule[day][time];
-                return (
+              <div className="activity-types">
+                {activityTypes.map((type) => (
                   <div
-                    key={`${day}-${time}`}
-                    className={`schedule-cell ${activity ? "active-cell" : ""}`}
-                    style={{
-                      backgroundColor: activity
-                        ? getActivityColor(activity)
-                        : "",
-                      boxShadow: activity
-                        ? `0 0 10px ${getActivityColor(
-                            activity
-                          )}, 0 0 20px ${getActivityColor(activity)}`
-                        : "",
-                    }}
-                    onClick={() => handleCellClick(day, time)}
+                    key={type.id}
+                    className={`activity-type ${
+                      selectedActivity === type.id ? "selected" : ""
+                    }`}
+                    onClick={() => setSelectedActivity(type.id)}
                   >
-                    {activity && (
-                      <>
-                        <div className="activity-icon">
-                          {getActivityIcon(activity)}
-                        </div>
-                        <div className="activity-description">
-                          {activity.description}
-                        </div>
-                      </>
-                    )}
+                    <div className="activity-icon">
+                      {typeof type.icon === "string" ? (
+                        type.icon
+                      ) : (
+                        <type.icon />
+                      )}
+                    </div>
+                    <div>{type.name}</div>
                   </div>
-                );
-              })}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+                ))}
+              </div>
 
-      {isEditing && (
-        <div className="activity-modal">
-          <div className="activity-form">
-            <h2>
-              {selectedTime} on {selectedDay}
-            </h2>
+              <div className="form-group">
+                <label>Description:</label>
+                <input
+                  type="text"
+                  value={activityDescription}
+                  onChange={(e) => setActivityDescription(e.target.value)}
+                  placeholder="Enter activity description"
+                />
+              </div>
 
-            <div className="activity-types">
-              {activityTypes.map((type) => (
-                <div
-                  key={type.id}
-                  className={`activity-type ${
-                    selectedActivity === type.id ? "selected" : ""
-                  }`}
-                  onClick={() => setSelectedActivity(type.id)}
+              <div className="form-actions">
+                <button onClick={handleAddActivity} disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Save Activity"}
+                </button>
+                <button onClick={handleRemoveActivity} className="remove-btn">
+                  Remove
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="cancel-btn"
                 >
-                  <div className="activity-icon">{type.icon}</div>
-                  <div>{type.name}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="form-group">
-              <label>Description:</label>
-              <input
-                type="text"
-                value={activityDescription}
-                onChange={(e) => setActivityDescription(e.target.value)}
-                placeholder="Enter activity description"
-              />
-            </div>
-
-            <div className="form-actions">
-              <button onClick={handleAddActivity}>Save Activity</button>
-              <button onClick={handleRemoveActivity} className="remove-btn">
-                Remove
-              </button>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ThemeContext.Provider>
   );
 };
 

@@ -1,7 +1,9 @@
-// src/firebase.ts
+// src/firebase.js
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -12,7 +14,6 @@ const firebaseConfig = {
   messagingSenderId: "403527554588",
   appId: "1:403527554588:web:cb870bc499eb8eb98531d9",
   measurementId: "G-2VLQ0W6Y7L",
-  // Add this if you're using Realtime Database
   databaseURL: "https://schedule-kc-default-rtdb.firebaseio.com"
 };
 
@@ -20,8 +21,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize services
-const firestore = getFirestore(app);
+const analytics = getAnalytics(app);
 const auth = getAuth(app);
+const database = getDatabase(app);
+const firestore = getFirestore(app);
 
-// Export initialized instances
-export { app, firestore, auth };
+// Export the services
+export { app, analytics, auth, database, firestore };

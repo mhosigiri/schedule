@@ -1,0 +1,66 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  height: 60px;
+}
+
+.dark.header {
+  background-color: var(--dark-surface);
+}
+
+.light.header {
+  background-color: var(--light-surface);
+}
+
+.logo-container h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.user-controls {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.dark .theme-toggle {
+  color: var(--dark-text);
+}
+
+.light .theme-toggle {
+  color: var(--light-text);
+}
+
+.user-greeting {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.logout-button {
+  background: var(--dark-surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background: var(--accent);
+  color: white;
+} 

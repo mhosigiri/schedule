@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 // Import Firebase initialization FIRST to ensure it runs before any Firebase services are used
-import "./firebase/firebase";
+import "./firebase";
 
 // Now import components that use Firebase services
 import { AuthProvider } from "./contexts/AuthContext";

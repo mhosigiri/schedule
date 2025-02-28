@@ -10,6 +10,9 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import WeeklySchedule from "./components/WeeklySchedule";
 import Login from "./components/auth/login";
 import Signup from "./components/auth/signup";
+import ActivityTimeline from "./components/ActivityTimeline";
+import ForgotPassword from "./components/auth/ForgotPassword";
+import NotFound from "./components/auth/NotFound";
 import "./App.css";
 
 // Private route component
@@ -29,16 +32,27 @@ const App: React.FC = () => {
       <Router>
         <div className="app-container">
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
             <Route
               path="/"
+              element={
+                <PrivateRoute>
+                  <ActivityTimeline />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/schedule"
               element={
                 <PrivateRoute>
                   <WeeklySchedule />
                 </PrivateRoute>
               }
             />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" />} />
           </Routes>
         </div>
       </Router>

@@ -1,69 +1,106 @@
 // src/services/ScheduleService.ts
-import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
-import { firestore } from '../firebase/firebase'; // Import the pre-initialized firestore
-import { ScheduleData, initializeEmptySchedule } from '../types/schedule';
+import { database } from '../firebase';
+import { ref, onValue, set, get, DataSnapshot, Unsubscribe } from 'firebase/database';
+import { initializeEmptySchedule, ScheduleData } from '../types/schedule';
 
 class ScheduleService {
-  /**
-   * Save schedule to Firestore
-   */
-  async saveSchedule(userId: string, scheduleData: ScheduleData): Promise<void> {
+  // Add error handling for malformed data
+  async getSchedule(userId: string): Promise<ScheduleData> {
     try {
-      // Save to Firestore using the imported firestore instance
-      const docRef = doc(firestore, 'schedules', userId);
-      await setDoc(docRef, { 
-        data: scheduleData,
-        updatedAt: new Date().toISOString() 
-      });
-      console.log("Schedule successfully saved to Firestore");
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Error saving schedule:", error);
-      return Promise.reject(error);
-    }
-  }
+      if (!userId) {
+        throw new Error("User ID is required");
+      }
 
-  /**
-   * Get schedule from Firestore
-   */
-  async getSchedule(userId: string): Promise<ScheduleData | null> {
-    try {
-      // Try to get from Firestore using the imported firestore instance
-      const docRef = doc(firestore, 'schedules', userId);
-      const docSnap = await getDoc(docRef);
+      const scheduleRef = ref(database, `schedules/${userId}`);
+      const snapshot = await get(scheduleRef);
       
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return data.data as ScheduleData;
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Ensure data has proper structure
+        return { ...initializeEmptySchedule(), ...data };
       } else {
-        console.log("No schedule found for user, initializing empty schedule");
-        return initializeEmptySchedule();
+        // Only initialize empty schedule if no data exists
+        const emptySchedule = initializeEmptySchedule();
+        await this.saveSchedule(userId, emptySchedule);
+        return emptySchedule;
       }
     } catch (error) {
-      console.error("Error getting schedule:", error);
-      return Promise.reject(error);
+      console.error("Error fetching schedule:", error);
+      throw error;
     }
   }
 
-  /**
-   * Subscribe to schedule updates from Firestore
-   */
-  subscribeToSchedule(userId: string, callback: (data: ScheduleData | null) => void) {
-    // Subscribe to Firestore updates using the imported firestore instance
-    const docRef = doc(firestore, 'schedules', userId);
-    const unsubscribe = onSnapshot(docRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        callback(data.data as ScheduleData);
+  // Add data validation to subscription
+  subscribeToSchedule(userId: string, callback: (data: ScheduleData) => void): Unsubscribe {
+    if (!userId) {
+      console.error("User ID is required for subscription");
+      return () => {};
+    }
+
+    const scheduleRef = ref(database, `schedules/${userId}`);
+    
+    const unsubscribe = onValue(scheduleRef, (snapshot: DataSnapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Ensure data has proper structure
+        const schedule = { ...initializeEmptySchedule(), ...data };
+        callback(schedule);
       } else {
         callback(initializeEmptySchedule());
       }
     }, (error) => {
       console.error("Error in schedule subscription:", error);
-      callback(null);
+      callback(initializeEmptySchedule());
     });
 
     return unsubscribe;
+  }
+
+  // Add validation to save operation
+  async saveSchedule(userId: string, scheduleData: ScheduleData): Promise<boolean> {
+    try {
+      if (!userId) {
+        throw new Error("User ID is required");
+      }
+
+      console.log("Attempting to save schedule for user:", userId);
+      
+      // Create the reference
+      const scheduleRef = ref(database, `schedules/${userId}`);
+      
+      // Attempt to save
+      await set(scheduleRef, scheduleData);
+      console.log("Schedule saved successfully to path:", `schedules/${userId}`);
+      return true;
+    } catch (error) {
+      console.error("Error in saveSchedule:", error);
+      // Add specific error handling
+      if (error instanceof Error) {
+        if (error.message.includes("permission_denied")) {
+          console.error("Permission denied. Check database rules.");
+        } else if (error.message.includes("network")) {
+          console.error("Network error. Check your connection.");
+        }
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      throw error;
+    }
+  }
+
+  // Add database connection test
+  async testConnection(): Promise<boolean> {
+    try {
+      const testRef = ref(database, 'schedules');
+      await get(testRef);
+      console.log("Database connection test successful");
+      return true;
+    } catch (error) {
+      console.error("Database connection test failed:", error);
+      return false;
+    }
   }
 }
 

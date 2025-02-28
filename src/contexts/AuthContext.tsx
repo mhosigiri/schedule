@@ -7,8 +7,9 @@ import {
   signOut,
   updateProfile,
   User,
+  sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../firebase/firebase"; // Import the pre-initialized auth instance
+import { auth } from "../firebase"; // Import the pre-initialized auth instance
 
 interface AuthContextType {
   currentUser: User | null;
@@ -16,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -84,12 +86,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const resetPassword = (email: string) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
   const value = {
     currentUser,
     loading,
     login,
     signup,
     logout,
+    resetPassword,
   };
 
   return (
