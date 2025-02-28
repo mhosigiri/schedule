@@ -403,3 +403,11 @@
   height: 0.75rem;
   left: -2.35rem;
 } 
+.dark .activity-info .activity-type {
+  color: var(--dark-text);  /* or #ffffff */
+}
+
+/* Light mode */
+.light .activity-info .activity-type {
+  color: var(--dark-text);  /* or #121212 */
+}
